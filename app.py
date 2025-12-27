@@ -38,6 +38,7 @@ CORS(app, resources={
 UPLOAD_FOLDER = "images"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -181,7 +182,7 @@ def upload_direct():
 # ==========================================================
 @app.route("/")
 def home():
-    return "Flask server is running!"
+    return "Flask server is running heidad!"
 
 
 # ==========================================================
@@ -189,4 +190,3 @@ def home():
 # ==========================================================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
