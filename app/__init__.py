@@ -1,0 +1,37 @@
+import os
+from flask import Flask
+from flask_cors import CORS
+from app.config import SECRET_KEY, UPLOAD_FOLDER, CORS_ORIGINS, UPLOAD_PASSWORD
+
+
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = SECRET_KEY
+
+    app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+    app.config["UPLOAD_PASSWORD"] = UPLOAD_PASSWORD
+
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+    CORS(app, resources={
+        r"/*": {
+            "origins": CORS_ORIGINS,
+            "methods": ["GET", "POST", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "x-api-key"],
+            "supports_credentials": True
+        }
+    })
+
+    from app.blueprints.auth import bp as auth_bp
+    from app.blueprints.images_api import bp as images_bp
+    from app.blueprints.upload_ui import bp as upload_ui_bp
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(images_bp)
+    app.register_blueprint(upload_ui_bp)
+
+    @app.route("/")
+    def home():
+        return "Flask server is running (factory mode)"
+
+    return app
