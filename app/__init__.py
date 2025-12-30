@@ -3,9 +3,11 @@ from flask import Flask
 from flask_cors import CORS
 from app.config import SECRET_KEY, UPLOAD_FOLDER, CORS_ORIGINS, UPLOAD_PASSWORD
 
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
     app.secret_key = SECRET_KEY
 
     app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
