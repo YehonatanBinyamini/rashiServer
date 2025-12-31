@@ -11,8 +11,6 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 def create_app():
     app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
-    app.secret_key = SECRET_KEY
-
     app.config.from_object(Config)
 
     db.init_app(app)
