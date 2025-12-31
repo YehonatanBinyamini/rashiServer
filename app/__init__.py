@@ -15,7 +15,7 @@ def create_app():
 
     db.init_app(app)
 
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     CORS(app, resources={
         r"/*": {
