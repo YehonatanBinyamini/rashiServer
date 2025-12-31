@@ -1,7 +1,10 @@
 import os
 from flask import Flask
 from flask_cors import CORS
-from app.config import SECRET_KEY, UPLOAD_FOLDER, CORS_ORIGINS, UPLOAD_PASSWORD
+from flask_sqlalchemy import SQLAlchemy
+from app.config import Config, BASE_DIR
+
+db = SQLAlchemy()
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -10,8 +13,9 @@ def create_app():
     app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
     app.secret_key = SECRET_KEY
 
-    app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-    app.config["UPLOAD_PASSWORD"] = UPLOAD_PASSWORD
+    app.config.from_object(Config)
+
+    db.init_app(app)
 
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
