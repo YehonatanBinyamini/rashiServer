@@ -6,8 +6,6 @@ from app.config import Config, BASE_DIR
 
 db = SQLAlchemy()
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
 
 def create_app():
     app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
@@ -19,7 +17,7 @@ def create_app():
 
     CORS(app, resources={
         r"/*": {
-            "origins": CORS_ORIGINS,
+            "origins": app.config["CORS_ORIGINS"],
             "methods": ["GET", "POST", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization", "x-api-key"],
             "supports_credentials": True
