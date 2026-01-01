@@ -1,8 +1,13 @@
 import os
 from logging.config import fileConfig
-
+import sys
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
 # Alembic Config object
 config = context.config
