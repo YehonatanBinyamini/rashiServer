@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import insert
 from app import create_app, db
 from app.models.pray_times import PrayTimes
 
-from app.services.zmanim import get_sunrise_sunset
+from app.services.zmanei_tfila import get_sunrise_sunset
 from app.services.zmanim_adjust import apply_offsets
 from app.services.pray_calc import calc_shacharit, calc_mincha, calc_arvit
 
