@@ -1,6 +1,6 @@
 from __future__ import annotations
 from app.services.pray_calc import calc_shacharit, calc_mincha, calc_arvit
-from zmanim_adjust import apply_offsets
+from app.services.zmanim_adjust import apply_offsets
 from datetime import date, datetime, timedelta
 import requests
 
