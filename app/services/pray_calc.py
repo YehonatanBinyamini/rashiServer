@@ -27,6 +27,17 @@ def round_to_5_minutes(dt: datetime, mode: RoundMode = "nearest") -> datetime:
     return base + timedelta(minutes=minutes)
 
 
+def round_up_to_5_minutes(dt: datetime) -> datetime:
+    """
+    Always round UP to the next 5-minute mark.
+    """
+    total_minutes = dt.hour * 60 + dt.minute
+    rounded = ceil(total_minutes / 5) * 5
+
+    base = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    return base + timedelta(minutes=rounded)
+
+
 def choose_time_in_window(
     anchor: datetime,
     *,
@@ -90,4 +101,4 @@ def calc_arvit(sunrise_adj: datetime, sunset_adj: datetime, round_mode: RoundMod
     day_len = sunset_adj - sunrise_adj
     offset = day_len * (13.5 / 720.0)
     raw = sunset_adj + offset
-    return round_to_5_minutes(raw, mode=round_mode)
+    return round_up_to_5_minutes(raw, mode=round_mode)
