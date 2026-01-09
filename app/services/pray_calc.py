@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Literal
+from math import ceil
 
 RoundMode = Literal["down", "up", "nearest"]
 
