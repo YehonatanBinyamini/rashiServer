@@ -101,4 +101,4 @@ def calc_arvit(sunrise_adj: datetime, sunset_adj: datetime, round_mode: RoundMod
     day_len = sunset_adj - sunrise_adj
     offset = day_len * (13.5 / 720.0)
     raw = sunset_adj + offset
-    return round_up_to_5_minutes(raw, mode=round_mode)
+    return round_up_to_5_minutes(raw)
