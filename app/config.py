@@ -22,7 +22,6 @@ class Config:
         "https://zichron-olam.web.app",
         "https://zichron-olam.firebaseapp.com",
         "https://rashi63.com",
-        "https://server.rashi63.com",
         "http://localhost:5173",
         "http://localhost:3000",
     ]

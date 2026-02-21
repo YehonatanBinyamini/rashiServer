@@ -28,7 +28,9 @@ def create_app():
     from app.blueprints.images_api import bp as images_bp
     from app.blueprints.upload_ui import bp as upload_ui_bp
     from app.blueprints.pray_times_api import bp as pray_times_api_bp
+    from blueprints.dvar_torah_api import dvar_torah_api
 
+    app.register_blueprint(dvar_torah_api)
     app.register_blueprint(auth_bp)
     app.register_blueprint(images_bp)
     app.register_blueprint(upload_ui_bp)
