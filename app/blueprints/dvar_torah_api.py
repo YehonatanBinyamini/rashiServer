@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from convertdate import hebrew
 from flask import Blueprint, jsonify, request
 
 from app import db
@@ -12,6 +13,54 @@ RABBI_TO_ID = {
     'הרב אברהם יוסף שליט"א': 1,
     "הרב יהונתן בנימיני": 2,
 }
+
+HEB_MONTHS = {
+    1: "ניסן",
+    2: "אייר",
+    3: "סיון",
+    4: "תמוז",
+    5: "אב",
+    6: "אלול",
+    7: "תשרי",
+    8: "חשון",
+    9: "כסלו",
+    10: "טבת",
+    11: "שבט",
+    12: "אדר",
+    13: "אדר ב׳",
+}
+
+HEB_YEARS = {
+    5785: 'תשפ״ה',
+    5786: 'תשפ״ו',
+    5787: 'תשפ״ז',
+    5788: 'תשפ״ח',
+    5789: 'תשפ״ט',
+    5790: 'תש״ץ',
+    5791: 'תשצ"א',
+    5791: 'תשצ"ב',
+    5791: 'תשצ"ג',
+    5791: 'תשצ"ד',
+    5791: 'תשצ"ה',
+    5791: 'תשצ"ו',
+}
+
+
+def to_hebrew_date_str(dt: datetime) -> str:
+    """
+    מקבל datetime (UTC) ומחזיר מחרוזת עברית כמו: 'כב תמוז תשפה'
+    """
+    g = dt.date()
+    hy, hm, hd = hebrew.from_gregorian(g.year, g.month, g.day)
+
+    month_name = HEB_MONTHS.get(hm, str(hm))
+    year_str = HEB_YEARS.get(hy, str(hy))  # fallback אם לא במפה
+
+    # יום בחודש (מספר) -> נשאיר מספר? אצלך זה "כב" (אותיות)
+    # אז נמיר לאותיות עבריות בסיסי (1..30)
+    day_str = hebrew_day_to_hebrew_letters(hd)
+
+    return f"{day_str} {month_name} {year_str}"
 
 
 def _parse_date_gregorian(val):
@@ -42,6 +91,18 @@ def _parse_date_gregorian(val):
     raise ValueError("Invalid date_gregorian type")
 
 
+HEB_NUM = {
+    1: "א", 2: "ב", 3: "ג", 4: "ד", 5: "ה", 6: "ו", 7: "ז", 8: "ח", 9: "ט",
+    10: "י", 11: "יא", 12: "יב", 13: "יג", 14: "יד", 15: "טו", 16: "טז",
+    17: "יז", 18: "יח", 19: "יט", 20: "כ", 21: "כא", 22: "כב", 23: "כג",
+    24: "כד", 25: "כה", 26: "כו", 27: "כז", 28: "כח", 29: "כט", 30: "ל",
+}
+
+
+def hebrew_day_to_hebrew_letters(d: int) -> str:
+    return HEB_NUM.get(d, str(d))
+
+
 def _as_dict(row: DvarTorah):
     return {
         "id": row.id,
@@ -50,7 +111,7 @@ def _as_dict(row: DvarTorah):
         "content": row.content,
         "date_hebrew": row.date_hebrew,
         "date_gregorian": row.date_gregorian.isoformat() if row.date_gregorian else None,
-        "created_at": row.created_at.isoformat() if row.created_at else None,
+        "updated_at": row.updated_at.isoformat() if row.updated_at else None,
     }
 
 
@@ -101,14 +162,10 @@ def save():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
-    # created_at אצלך הוא NOT NULL.
-    # לפי הדרישה שלך: "בעדכון יכלול את כל שדות הרשומה" -> נעדכן גם created_at לזמן עכשיו.
-    # (אם תרצה ש-created_at יהיה רק יצירה, תגיד ונשנה.)
     row.title = title
     row.content = content
-    row.date_hebrew = date_hebrew
     row.date_gregorian = date_gregorian
-    row.created_at = datetime.utcnow()
+    row.date_hebrew = to_hebrew_date_str(row.updated_at)
 
     db.session.commit()
 
