@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 
 from app import db
 from app.models.news_flash import NewsFlash
+from app.utils.hebrew_date import to_hebrew_date_str
 
 
 bp = Blueprint("news_flash_api", __name__, url_prefix="/api/news")
@@ -85,6 +86,10 @@ def create_news():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
+    # if no explicit hebrew date provided, compute one from Gregorian
+    if not date_hebrew:
+        date_hebrew = to_hebrew_date_str(date_gregorian)
+
     row = NewsFlash(
         title=title,
         content=content,
@@ -121,7 +126,11 @@ def update_news(row_id: int):
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
-    row.date_hebrew = date_hebrew
+    # prefer explicit date_hebrew if provided, otherwise compute from Gregorian date
+    if "date_hebrew" in data:
+        row.date_hebrew = date_hebrew
+    elif "date_gregorian" in data:
+        row.date_hebrew = to_hebrew_date_str(row.date_gregorian)
 
     db.session.commit()
 
