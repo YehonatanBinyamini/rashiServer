@@ -43,9 +43,6 @@ def _parse_date_gregorian(val):
     raise ValueError("Invalid date_gregorian type")
 
 
-
-
-
 def _as_dict(row: DvarTorah):
     return {
         "id": row.id,
