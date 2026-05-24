@@ -11,6 +11,9 @@ from app.models.pray_times import PrayTimes
 from app.services.zmanei_tfila import get_sunrise_sunset
 from app.services.zmanim_adjust import apply_offsets
 from app.services.pray_calc import calc_shacharit, calc_mincha, calc_arvit
+from app.utils.zman_image import create_zman_image
+from app.services.email_sender import send_email_with_attachment
+import os
 
 
 def _next_sunday(after_day: date) -> date:
@@ -51,8 +54,9 @@ def compute_weekly_pray_times(friday: date, geonameid: int = 293397) -> dict:
     earliest_sunset = min(sunset_list)
 
     shacharit_week = calc_shacharit(earliest_sunrise)
-    mincha_week = calc_mincha(earliest_sunset)
+    # mincha_week = calc_mincha(earliest_sunset)
     arvit_week = max(arvit_list)  # הכי מאוחר בשבוע
+    mincha_week = arvit_week.replace(minute=arvit_week.minute - 40)
 
     return {
         "days": days,
@@ -92,6 +96,28 @@ def main():
     app = create_app()
     with app.app_context():
         upsert_week_into_pray_times(friday)
+        # Generate image for the computed weekly times
+        try:
+            res = compute_weekly_pray_times(friday)
+            shacharit = res.get("shacharit")
+            mincha = res.get("mincha")
+            arvit = res.get("arvit")
+
+            output_path = os.getenv("ZMANIM_IMAGE_PATH", "zmanim_output.jpg")
+            logo_path = os.getenv("ZMANIM_LOGO_PATH", "rashiLogo.PNG")
+
+            img_file = create_zman_image(shacharit, mincha, arvit, output_path=output_path, logo_path=logo_path)
+            print(f"Created image: {img_file}")
+
+            # send email
+            to_addr = os.getenv("EMAIL_TO") or os.getenv("EMAIL_USER") or "yonile2106@gmail.com"
+            subject = f"זמני תפילות - שבוע של {friday.isoformat()}"
+            body = f"מצורפת תמונה עם זמני התפילות לשבוע שמתחיל אחרי {friday.isoformat()}\n\nשחרית: {shacharit}\nמנחה: {mincha}\nערבית: {arvit}"
+
+            send_email_with_attachment(subject, body, [to_addr], img_file)
+            print(f"Email sent to: {to_addr}")
+        except Exception as e:
+            print(f"Failed to create/send image: {e}")
 
 
 if __name__ == "__main__":
