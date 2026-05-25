@@ -11,6 +11,7 @@ from app.models.pray_times import PrayTimes
 from app.services.zmanei_tfila import get_sunrise_sunset
 from app.services.zmanim_adjust import apply_offsets
 from app.services.pray_calc import calc_shacharit, calc_mincha, calc_arvit
+from app.utils.zman_compute import compute_weekly_pray_times
 from app.utils.zman_image import create_zman_image
 from app.services.email_sender import send_email_with_attachment
 import os
