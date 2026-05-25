@@ -8,11 +8,22 @@ from typing import Optional
 
 # RTL helper
 def rtl(text: str) -> str:
-    # Prepend RLM (Right-to-Left Mark) to help rendering of mixed text
+    # If text contains Hebrew characters, produce a visual-order string
+    # that works with Pillow's LTR rendering. For most cases get_display
+    # produces correct visual order; however some Pillow builds ignore
+    # bidi direction, so we reverse the visual output for Hebrew strings
     try:
-        return "\u200F" + get_display(text)
+        visual = get_display(text)
     except Exception:
-        return text
+        visual = text
+
+    # detect Hebrew characters (Unicode block U+0590..U+05FF)
+    has_hebrew = any('\u0590' <= ch <= '\u05FF' for ch in text)
+    if has_hebrew:
+        # Prepend RLM and reverse the visual string to accommodate
+        # renderers that draw left-to-right
+        return "\u200F" + visual[::-1]
+    return visual
 
 
 def load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
