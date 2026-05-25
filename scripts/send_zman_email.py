@@ -15,6 +15,16 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 load_dotenv()  # load .env from project root if present
+# Also try to load the system env file if present (e.g. /etc/flaskapp.env)
+SYSTEM_ENV = "/etc/flaskapp.env"
+if os.path.exists(SYSTEM_ENV):
+    try:
+        load_dotenv(SYSTEM_ENV, override=True)
+        print(f"Loaded system env file: {SYSTEM_ENV}")
+    except Exception as e:
+        print(f"Could not load {SYSTEM_ENV}: {e}")
+else:
+    print(f"System env file not found: {SYSTEM_ENV}")
 
 
 def main():
