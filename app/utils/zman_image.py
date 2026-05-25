@@ -8,7 +8,11 @@ from typing import Optional
 
 # RTL helper
 def rtl(text: str) -> str:
-    return get_display(text)
+    # Prepend RLM (Right-to-Left Mark) to help rendering of mixed text
+    try:
+        return "\u200F" + get_display(text)
+    except Exception:
+        return text
 
 
 def load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
