@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from PIL import Image, ImageDraw, ImageFont
-from bidi.algorithm import get_display
 import os
 from typing import Optional
 
@@ -9,16 +8,11 @@ WIDTH = 1240
 HEIGHT = 1754
 
 
-def rtl(text: str) -> str:
-    return get_display(text)
-
-
 def load_font(size: int, bold: bool = False):
     fonts = [
-        "C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf",
-        "/System/Library/Fonts/Supplemental/Arial Bold.ttf" if bold else "/System/Library/Fonts/Supplemental/Arial.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf",
     ]
 
     for font_path in fonts:
@@ -29,19 +23,11 @@ def load_font(size: int, bold: bool = False):
 
 
 def draw_centered(draw, text: str, y: int, font, fill: str = "black"):
-    text = rtl(text)
-
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
-
     x = (WIDTH - text_width) // 2
 
-    draw.text(
-        (x, y),
-        text,
-        fill=fill,
-        font=font
-    )
+    draw.text((x, y), text, fill=fill, font=font)
 
 
 def create_zman_image(
@@ -63,21 +49,16 @@ def create_zman_image(
 
     if logo_path and os.path.exists(logo_path):
         logo = Image.open(logo_path).convert("RGBA")
-
         logo_width = 340
         ratio = logo_width / logo.width
         logo_height = int(logo.height * ratio)
-
         logo = logo.resize((logo_width, logo_height))
 
         logo_x = (WIDTH - logo_width) // 2
         logo_y = 55
-
         img.paste(logo, (logo_x, logo_y), logo)
 
-    # בס"ד — בדיוק כמו בקוד שעבד לך
-    bsd_text = rtl('בס"ד')
-
+    bsd_text = 'בס"ד'
     bbox = draw.textbbox((0, 0), bsd_text, font=bsd_font)
     bsd_width = bbox[2] - bbox[0]
 
@@ -95,14 +76,8 @@ def create_zman_image(
     draw_centered(draw, f"{arvit} ערבית", 1080, big_font)
 
     bottom_y = 1430
-
     for i, line in enumerate((bottom_note or "").split("\n")):
-        draw_centered(
-            draw,
-            line,
-            bottom_y + (i * 75),
-            bottom_font
-        )
+        draw_centered(draw, line, bottom_y + (i * 75), bottom_font)
 
     out_dir = os.path.dirname(output_path) or "."
     os.makedirs(out_dir, exist_ok=True)
