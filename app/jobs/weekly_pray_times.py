@@ -57,8 +57,7 @@ def compute_weekly_pray_times(friday: date, geonameid: int = 293397) -> dict:
     shacharit_week = calc_shacharit(earliest_sunrise)
     # mincha_week = calc_mincha(earliest_sunset)
     arvit_week = max(arvit_list)  # הכי מאוחר בשבוע
-    mincha_week = arvit_week.replace(minute=arvit_week.minute - 40)
-
+    mincha_week = arvit_week - timedelta(minutes=40)
     return {
         "days": days,
         "shacharit": _fmt_hhmm(shacharit_week),
