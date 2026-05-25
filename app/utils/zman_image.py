@@ -82,6 +82,36 @@ def draw_centered(draw: ImageDraw.ImageDraw, text: str, y: int, font: ImageFont.
         draw.text((x, y), text, fill=fill, font=font)
 
 
+def draw_time_label(draw: ImageDraw.ImageDraw, time_text: str, label: str, y: int, time_font: ImageFont.FreeTypeFont, label_font: ImageFont.FreeTypeFont, gap: int = 20, fill: str = "black"):
+    """Draw a centered block where the time (LTR) appears left and the Hebrew label (RTL) appears right.
+
+    This preserves digit order while keeping the overall block centered.
+    """
+    # prepare texts
+    time = time_text
+    label_vis = rtl(label)
+
+    # measure widths
+    time_bbox = draw.textbbox((0, 0), time, font=time_font)
+    time_w = time_bbox[2] - time_bbox[0]
+
+    label_bbox = draw.textbbox((0, 0), label_vis, font=label_font)
+    label_w = label_bbox[2] - label_bbox[0]
+
+    total_w = time_w + gap + label_w
+    x0 = (WIDTH - total_w) // 2
+
+    # draw time (LTR)
+    draw.text((x0, y), time, fill=fill, font=time_font)
+
+    # draw label to the right of time; try direction=rtl for label
+    label_x = x0 + time_w + gap
+    try:
+        draw.text((label_x, y), label_vis, fill=fill, font=label_font, direction='rtl')
+    except TypeError:
+        draw.text((label_x, y), label_vis, fill=fill, font=label_font)
+
+
 def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str = "zmanim_output.jpg", logo_path: Optional[str] = "rashiLogo.PNG", bottom_note: Optional[str] = "*בימי שני ב-18:45\nמנחה וערבית") -> str:
     debug = os.getenv("ZMANIM_DEBUG")
     img = Image.new("RGB", (WIDTH, HEIGHT), "white")
@@ -125,10 +155,10 @@ def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str 
     # title
     draw_centered(draw, "זמני תפילות בימי חול", 370, title_font)
 
-    # times
-    draw_centered(draw, f"{shacharit} שחרית", 580, big_font)
-    draw_centered(draw, f"{mincha} מנחה", 830, big_font)
-    draw_centered(draw, f"{arvit} ערבית", 1080, big_font)
+    # times: draw number (LTR) then Hebrew label (RTL) so digits keep order
+    draw_time_label(draw, shacharit, "שחרית", 580, big_font, big_font)
+    draw_time_label(draw, mincha, "מנחה", 830, big_font, big_font)
+    draw_time_label(draw, arvit, "ערבית", 1080, big_font, big_font)
 
     # bottom note
     bottom_y = 1430
