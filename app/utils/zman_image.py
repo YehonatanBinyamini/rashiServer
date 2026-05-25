@@ -107,7 +107,8 @@ def draw_time_label(draw: ImageDraw.ImageDraw, time_text: str, label: str, y: in
     # draw label to the right of time; try direction=rtl for label
     label_x = x0 + time_w + gap
     try:
-        draw.text((label_x, y), label_vis, fill=fill, font=label_font, direction='rtl')
+        draw.text((label_x, y), label_vis, fill=fill,
+                  font=label_font, direction='rtl')
     except TypeError:
         draw.text((label_x, y), label_vis, fill=fill, font=label_font)
 
