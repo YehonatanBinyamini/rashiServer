@@ -103,7 +103,8 @@ def draw_time_label(draw: ImageDraw.ImageDraw, time_text: str, label: str, y: in
 
     # draw label (Hebrew) on the left of the time; use RTL direction for label
     try:
-        draw.text((x0, y), label_vis, fill=fill, font=label_font, direction='rtl')
+        draw.text((x0, y), label_vis, fill=fill,
+                  font=label_font, direction='rtl')
     except TypeError:
         draw.text((x0, y), label_vis, fill=fill, font=label_font)
 
@@ -151,7 +152,8 @@ def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str 
     bsd_width = bbox[2] - bbox[0]
     x_bsd = WIDTH - bsd_width - 60
     try:
-        draw.text((x_bsd, 50), bsd_text, fill="black", font=bsd_font, direction='rtl')
+        draw.text((x_bsd, 50), bsd_text, fill="black",
+                  font=bsd_font, direction='rtl')
     except TypeError:
         draw.text((x_bsd, 50), bsd_text, fill="black", font=bsd_font)
 
