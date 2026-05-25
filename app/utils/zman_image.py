@@ -9,21 +9,44 @@ from typing import Optional
 # RTL helper
 def rtl(text: str) -> str:
     # If text contains Hebrew characters, produce a visual-order string
-    # that works with Pillow's LTR rendering. For most cases get_display
-    # produces correct visual order; however some Pillow builds ignore
-    # bidi direction, so we reverse the visual output for Hebrew strings
+    # that works with Pillow's LTR rendering. Use get_display(), then
+    # reverse only runs of Hebrew letters (so numeric runs like "5:05"
+    # keep their left-to-right order).
     try:
         visual = get_display(text)
     except Exception:
         visual = text
 
-    # detect Hebrew characters (Unicode block U+0590..U+05FF)
-    has_hebrew = any('\u0590' <= ch <= '\u05FF' for ch in text)
-    if has_hebrew:
-        # Prepend RLM and reverse the visual string to accommodate
-        # renderers that draw left-to-right
-        return "\u200F" + visual[::-1]
-    return visual
+    def is_hebrew(ch: str) -> bool:
+        return '\u0590' <= ch <= '\u05FF'
+
+    has_hebrew = any(is_hebrew(ch) for ch in text)
+    if not has_hebrew:
+        return visual
+
+    # Split into runs of same script (hebrew vs non-hebrew)
+    runs = []
+    current_run = visual[0]
+    current_hebrew = is_hebrew(visual[0])
+    for ch in visual[1:]:
+        ch_hebrew = is_hebrew(ch)
+        if ch_hebrew == current_hebrew:
+            current_run += ch
+        else:
+            runs.append((current_hebrew, current_run))
+            current_run = ch
+            current_hebrew = ch_hebrew
+    runs.append((current_hebrew, current_run))
+
+    # Reverse only the Hebrew runs to produce a visual-friendly string
+    out = []
+    for is_h, run in runs:
+        if is_h:
+            out.append(run[::-1])
+        else:
+            out.append(run)
+
+    return "\u200F" + "".join(out)
 
 
 def load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
