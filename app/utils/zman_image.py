@@ -37,10 +37,15 @@ def draw_centered(draw: ImageDraw.ImageDraw, text: str, y: int, font: ImageFont.
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
     x = (WIDTH - text_width) // 2
-    draw.text((x, y), text, fill=fill, font=font)
+    # Try to use Pillow's direction support for RTL if available
+    try:
+        draw.text((x, y), text, fill=fill, font=font, direction='rtl')
+    except TypeError:
+        draw.text((x, y), text, fill=fill, font=font)
 
 
 def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str = "zmanim_output.jpg", logo_path: Optional[str] = "rashiLogo.PNG", bottom_note: Optional[str] = "*בימי שני ב-18:45\nמנחה וערבית") -> str:
+    debug = os.getenv("ZMANIM_DEBUG")
     img = Image.new("RGB", (WIDTH, HEIGHT), "white")
     draw = ImageDraw.Draw(img)
 
@@ -50,8 +55,12 @@ def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str 
     bsd_font = load_font(42, bold=True)
 
     # logo
+    if debug:
+        print(f"[zman_image] logo_path={logo_path}")
     if logo_path and os.path.exists(logo_path):
         try:
+            if debug:
+                print(f"[zman_image] loading logo from {logo_path}")
             logo = Image.open(logo_path).convert("RGBA")
             logo_width = 340
             ratio = logo_width / logo.width
@@ -60,8 +69,13 @@ def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str 
             logo_x = (WIDTH - logo_width) // 2
             logo_y = 55
             img.paste(logo, (logo_x, logo_y), logo)
-        except Exception:
+        except Exception as e:
+            if debug:
+                print(f"[zman_image] failed to load logo: {e}")
             pass
+    else:
+        if debug:
+            print(f"[zman_image] logo not found at {logo_path}")
 
     # בס"ד
     bsd_text = rtl('בס"ד')
