@@ -67,7 +67,8 @@ def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str 
     bsd_text = rtl('בס"ד')
     bbox = draw.textbbox((0, 0), bsd_text, font=bsd_font)
     bsd_width = bbox[2] - bbox[0]
-    draw.text((WIDTH - bsd_width - 60, 50), bsd_text, fill="black", font=bsd_font)
+    draw.text((WIDTH - bsd_width - 60, 50),
+              bsd_text, fill="black", font=bsd_font)
 
     # title
     draw_centered(draw, "זמני תפילות בימי חול", 370, title_font)

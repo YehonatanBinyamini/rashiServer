@@ -26,7 +26,8 @@ def send_email_with_attachment(subject: str, body: str, to_addrs: Iterable[str],
         img_data = f.read()
     maintype = "image"
     subtype = "jpeg"
-    msg.add_attachment(img_data, maintype=maintype, subtype=subtype, filename=os.path.basename(attachment_path))
+    msg.add_attachment(img_data, maintype=maintype, subtype=subtype,
+                       filename=os.path.basename(attachment_path))
 
     with smtplib.SMTP(DEFAULT_SMTP, DEFAULT_PORT) as smtp:
         smtp.ehlo()

@@ -106,11 +106,13 @@ def main():
             output_path = os.getenv("ZMANIM_IMAGE_PATH", "zmanim_output.jpg")
             logo_path = os.getenv("ZMANIM_LOGO_PATH", "rashiLogo.PNG")
 
-            img_file = create_zman_image(shacharit, mincha, arvit, output_path=output_path, logo_path=logo_path)
+            img_file = create_zman_image(
+                shacharit, mincha, arvit, output_path=output_path, logo_path=logo_path)
             print(f"Created image: {img_file}")
 
             # send email
-            to_addr = os.getenv("EMAIL_TO") or os.getenv("EMAIL_USER") or "yonile2106@gmail.com"
+            to_addr = os.getenv("EMAIL_TO") or os.getenv(
+                "EMAIL_USER") or "yonile2106@gmail.com"
             subject = f"זמני תפילות - שבוע של {friday.isoformat()}"
             body = f"מצורפת תמונה עם זמני התפילות לשבוע שמתחיל אחרי {friday.isoformat()}\n\nשחרית: {shacharit}\nמנחה: {mincha}\nערבית: {arvit}"
 
