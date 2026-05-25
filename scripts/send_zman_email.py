@@ -1,4 +1,9 @@
 from __future__ import annotations
+import os
+from app.services.email_sender import send_email_with_attachment
+from app.utils.zman_image import create_zman_image
+from app.jobs.weekly_pray_times import compute_weekly_pray_times
+from app import create_app
 
 import argparse
 from datetime import date
@@ -9,12 +14,6 @@ import pathlib
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
-from app import create_app
-from app.jobs.weekly_pray_times import compute_weekly_pray_times
-from app.utils.zman_image import create_zman_image
-from app.services.email_sender import send_email_with_attachment
-import os
 
 
 def main():
