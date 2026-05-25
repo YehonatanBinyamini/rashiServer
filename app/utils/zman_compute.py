@@ -22,7 +22,11 @@ def _week_days_sun_to_thu(friday: date) -> List[date]:
 
 
 def _fmt_hhmm(dt: datetime) -> str:
-    return dt.strftime("%H:%M")
+    s = dt.strftime("%H:%M")
+    # remove leading zero from hour (produce '5:05' instead of '05:05')
+    if s.startswith("0"):
+        s = s[1:]
+    return s
 
 
 def compute_weekly_pray_times(friday: date, geonameid: int = 293397) -> dict:

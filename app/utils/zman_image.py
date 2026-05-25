@@ -98,19 +98,18 @@ def draw_time_label(draw: ImageDraw.ImageDraw, time_text: str, label: str, y: in
     label_bbox = draw.textbbox((0, 0), label_vis, font=label_font)
     label_w = label_bbox[2] - label_bbox[0]
 
-    total_w = time_w + gap + label_w
+    total_w = label_w + gap + time_w
     x0 = (WIDTH - total_w) // 2
 
-    # draw time (LTR)
-    draw.text((x0, y), time, fill=fill, font=time_font)
-
-    # draw label to the right of time; try direction=rtl for label
-    label_x = x0 + time_w + gap
+    # draw label (Hebrew) on the left of the time; use RTL direction for label
     try:
-        draw.text((label_x, y), label_vis, fill=fill,
-                  font=label_font, direction='rtl')
+        draw.text((x0, y), label_vis, fill=fill, font=label_font, direction='rtl')
     except TypeError:
-        draw.text((label_x, y), label_vis, fill=fill, font=label_font)
+        draw.text((x0, y), label_vis, fill=fill, font=label_font)
+
+    # draw time to the right of label (preserve LTR digits)
+    time_x = x0 + label_w + gap
+    draw.text((time_x, y), time, fill=fill, font=time_font)
 
 
 def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str = "zmanim_output.jpg", logo_path: Optional[str] = "rashiLogo.PNG", bottom_note: Optional[str] = "*בימי שני ב-18:45\nמנחה וערבית") -> str:
@@ -150,8 +149,11 @@ def create_zman_image(shacharit: str, mincha: str, arvit: str, output_path: str 
     bsd_text = rtl('בס"ד')
     bbox = draw.textbbox((0, 0), bsd_text, font=bsd_font)
     bsd_width = bbox[2] - bbox[0]
-    draw.text((WIDTH - bsd_width - 60, 50),
-              bsd_text, fill="black", font=bsd_font)
+    x_bsd = WIDTH - bsd_width - 60
+    try:
+        draw.text((x_bsd, 50), bsd_text, fill="black", font=bsd_font, direction='rtl')
+    except TypeError:
+        draw.text((x_bsd, 50), bsd_text, fill="black", font=bsd_font)
 
     # title
     draw_centered(draw, "זמני תפילות בימי חול", 370, title_font)
