@@ -1,4 +1,11 @@
 from __future__ import annotations
+from datetime import date
+import argparse
+from app.utils.zman_compute import compute_weekly_pray_times
+from app.utils.zman_image import create_zman_image
+from app.services.email_sender import send_email_with_attachment
+import os
+from dotenv import load_dotenv
 import sys
 import pathlib
 
@@ -7,16 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from dotenv import load_dotenv
 load_dotenv()  # load .env from project root if present
-
-import os
-from app.services.email_sender import send_email_with_attachment
-from app.utils.zman_image import create_zman_image
-from app.utils.zman_compute import compute_weekly_pray_times
-
-import argparse
-from datetime import date
 
 
 def main():
