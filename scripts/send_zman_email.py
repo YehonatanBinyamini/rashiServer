@@ -1,20 +1,23 @@
 from __future__ import annotations
-from datetime import date
+
 import argparse
-from app.utils.zman_compute import compute_weekly_pray_times
-from app.utils.zman_image import create_zman_image
-from app.services.email_sender import send_email_with_attachment
 import os
-from dotenv import load_dotenv
-import sys
 import pathlib
+import sys
+from datetime import date
+
+from dotenv import load_dotenv
 
 # Ensure project root is on sys.path so `from app import ...` works when running as script
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-load_dotenv()  # load .env from project root if present
+from app.services.email_sender import send_email_with_attachment
+from app.utils.zman_compute import compute_weekly_pray_times
+from app.utils.zman_image import create_zman_image
+
+load_dotenv(ROOT / ".env")  # load .env from project root if present
 # Also try to load the system env file if present (e.g. /etc/flaskapp.env)
 SYSTEM_ENV = "/etc/flaskapp.env"
 if os.path.exists(SYSTEM_ENV):
@@ -25,6 +28,13 @@ if os.path.exists(SYSTEM_ENV):
         print(f"Could not load {SYSTEM_ENV}: {e}")
 else:
     print(f"System env file not found: {SYSTEM_ENV}")
+
+
+def project_path(value: str) -> str:
+    path = pathlib.Path(value)
+    if not path.is_absolute():
+        path = ROOT / path
+    return str(path)
 
 
 def main():
@@ -50,8 +60,8 @@ def main():
     mincha = res.get("mincha")
     arvit = res.get("arvit")
 
-    output_path = os.getenv("ZMANIM_IMAGE_PATH", "zmanim_output.jpg")
-    logo_path = os.getenv("ZMANIM_LOGO_PATH", "rashiLogo.PNG")
+    output_path = project_path(os.getenv("ZMANIM_IMAGE_PATH", "zmanim_output.jpg"))
+    logo_path = project_path(os.getenv("ZMANIM_LOGO_PATH", "rashiLogo.PNG"))
 
     print(f"Creating image at: {output_path} using logo: {logo_path}")
     img_file = create_zman_image(
